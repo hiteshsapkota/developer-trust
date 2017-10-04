@@ -9,6 +9,7 @@ Created on Thu Sep 28 12:44:52 2017
 import requests
 import json
 import time
+import os
 start_time=time.time()
 no_of_requests=0
 ###Ensures number of requests donot exceed 5000 in one hour
@@ -47,11 +48,11 @@ def modifyurl(s):
             s1+=i
     return s1
 #####Writes json file 
-def writejson(url,p,projectname):
+def writejson(url,p,projectname,project_path):
     
     i=1
     filename=p+'_'+projectname+ '.txt'
-    with open(filename,'w') as outfile:
+    with open(project_path+'/'+filename,'w') as outfile:
         while True:
             global no_of_requests
             global username
@@ -96,25 +97,40 @@ def getprojectname(url):
 #####Main program that executes
 username= input("Enter github username\n")
 password=input("Enter password\n")
-url_collection=['https://api.github.com/repos/ipython/ipython']
-index=['deployments_url','merges_url','pulls_url','issue_comment_url','comments_url','git_commits_url','commits_url','pulls_url','teams_url','forks_url','issues_url','hooks_url',]
-for eachurl in url_collection:
+j=1
+path='/Users/hxs1943/Documents/PhD Research/Githubproject/'
+with open('project_url_collection.txt') as json_file:  
+    projecturllist = json.load(json_file)
+for q in projecturllist:
     limitchecker()
     while True:
+        if j>len(q):
+            break
+        eachurl=q['{0}'.format(j)]
+        j=j+1
         r = requests.get(eachurl,auth=(username, password))
         if r.status_code==200:
             projectname=getprojectname(eachurl)
+            project_path=path+projectname
+            os.makedirs(project_path)
             url_collection=projectname+'.txt'
-            with open(url_collection,'w') as outfile:
+            with open(project_path+'/'+url_collection,'w') as outfile:
                 url_link=r.json()
                 json.dump(url_link,outfile)
                 print('No problem!!!Writing to file url_collection')
-            with open(url_collection) as infile:
+            with open(project_path+'/'+url_collection) as infile:
                     url_list=json.load(infile)
-            for p in index:
-                url_o=url_list[p]
-                url_n=modifyurl(url_o)
-                writejson(url_n,p,projectname)
+                    i=1
+            with open('parameter_url_list.txt') as json_file:  
+                urllist = json.load(json_file)
+                for p in urllist:
+                    while True:
+                        if i>len(p):
+                            break
+                        url_o=url_list[p['{0}'.format(i)]]
+                        url_n=modifyurl(url_o)
+                        writejson(url_n,p['{0}'.format(i)],projectname,project_path)
+                        i=i+1
         break
     else:
         if r.status_code==403:
