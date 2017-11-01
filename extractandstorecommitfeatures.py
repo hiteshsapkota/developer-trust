@@ -26,13 +26,11 @@ with open(destination_path+'/'+'commitrecord.json','w') as outfile:
 flag=False
 name=False
 ###Reads project lists from csv file
-
 with open(destination_path+'/'+'commitrecord.json','r+') as infile:
     commitrecord=json.load(infile)
-with open('all_projects.csv', 'r') as csvfile:
-    projectlist = csv.DictReader(csvfile)
-
-    for row in projectlist:
+    with open('all_projects.csv', 'r') as csvfile:
+        projectlist = csv.DictReader(csvfile)
+        for row in projectlist:
             if row['language']=='Python':
                 projectname=row['repo_name']
                 print("I am currently working on repository:"+projectname)
@@ -67,5 +65,6 @@ with open('all_projects.csv', 'r') as csvfile:
             
                         except IndexError:
                             break
+                        
     infile.seek(0)
     json.dump(commitrecord,infile) 
