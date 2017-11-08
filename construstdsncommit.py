@@ -33,6 +33,6 @@ while True:
             
         a=False;   
         i=i+1
-    except IndexError:
+    except IndexError:##exception handling
         break
 nx.draw(G)
